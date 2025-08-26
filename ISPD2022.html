@@ -1,0 +1,2725 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISPD 2022 腹膜炎指南重點卡片系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        #searchInput:focus {
+            border-color: #667eea;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1);
+        }
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        .stats {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+        }
+        .card.expanded {
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        }
+        .card.hidden {
+            display: none;
+        }
+        .card-header {
+            padding: 25px;
+            position: relative;
+        }
+        .card-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2d3748;
+            padding-right: 40px;
+        }
+        .card-summary {
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+        .card-details {
+            padding: 0 25px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+        .card.expanded .card-details {
+            max-height: 5000px;
+            opacity: 1;
+            padding-bottom: 25px;
+        }
+        .card-details-content {
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+        .card-content ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .card-content li {
+            margin-bottom: 8px;
+        }
+        .highlight {
+            background-color: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        .recommendation-level {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .level-1 {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .level-2 {
+            background-color: #ddd6fe;
+            color: #5b21b6;
+        }
+        .level-ng {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+            font-size: 1.1rem;
+        }
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 50px;
+        }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-top: 10px;
+        }
+        .important {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        .expand-icon {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            color: #999;
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+        .card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+        .detail-section {
+            margin-top: 15px;
+        }
+        .detail-section h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        .detail-section p, .detail-section ul {
+            margin-bottom: 10px;
+        }
+        .clinical-pearl {
+            background-color: #fef3c7;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #f59e0b;
+        }
+        .clinical-pearl-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 5px;
+        }
+        /* Antibiotic Dose Reference Styles */
+        .dose-reference-container {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            text-align: center;
+        }
+        .dose-toggle-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .dose-toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+        .dose-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .dose-panel h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        .antibiotic-group {
+            margin-bottom: 30px;
+        }
+        .antibiotic-group h4 {
+            color: #059669;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            text-align: left;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 5px;
+        }
+        .dose-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .dose-table th {
+            background-color: #f3f4f6;
+            color: #2d3748;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+        }
+        .dose-table td {
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        .dose-table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+        .dose-table strong {
+            color: #2d3748;
+        }
+        .not-advised {
+            color: #ef4444;
+            font-style: italic;
+        }
+        .no-data {
+            color: #9ca3af;
+            font-style: italic;
+        }
+        .note {
+            color: #059669;
+            font-size: 0.85rem;
+            display: block;
+            margin-top: 5px;
+        }
+        .dose-legend {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f3f4f6;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .dose-legend p {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .dose-legend ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .dose-legend li {
+            margin-bottom: 5px;
+            color: #4a5568;
+        }
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .card-header {
+                padding: 20px;
+            }
+            .dose-panel {
+                padding: 20px;
+                max-height: 400px;
+            }
+            .dose-table {
+                font-size: 0.8rem;
+            }
+            .dose-table th, .dose-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ISPD 2022 腹膜透析相關腹膜炎指南</h1>
+            <p class="subtitle">預防與治療建議重點整理</p>
+        </header>
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="搜尋關鍵字（如：診斷、抗生素、預防...）">
+        </div>
+        <!-- Antibiotic Dose Reference -->
+        <div class="dose-reference-container">
+            <button class="dose-toggle-btn" id="doseToggle">
+                💊 IP抗生素劑量參考表
+            </button>
+            <div class="dose-panel" id="dosePanel" style="display: none;">
+                <h3>腹腔內抗生素劑量參考表 (Table 5)</h3>
+                <div class="dose-table-content">
+                    <!-- Aminoglycosides -->
+                    <div class="antibiotic-group">
+                        <h4>氨基糖苷類 (Aminoglycosides)</h4>
+                        <table class="dose-table">
+                            <thead>
+                                <tr>
+                                    <th>抗生素</th>
+                                    <th>間歇性給藥<br>(每日1次交換，至少6小時)</th>
+                                    <th>連續性給藥<br>(所有交換)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Amikacin</strong></td>
+                                    <td>2 mg/kg daily</td>
+                                    <td class="not-advised">不建議</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Gentamicin</strong></td>
+                                    <td>0.6 mg/kg daily</td>
+                                    <td class="not-advised">不建議</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Netilmicin</strong></td>
+                                    <td>0.6 mg/kg daily</td>
+                                    <td class="not-advised">不建議</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tobramycin</strong></td>
+                                    <td>0.6 mg/kg daily</td>
+                                    <td class="not-advised">不建議</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Cephalosporins -->
+                    <div class="antibiotic-group">
+                        <h4>頭孢菌素類 (Cephalosporins)</h4>
+                        <table class="dose-table">
+                            <thead>
+                                <tr>
+                                    <th>抗生素</th>
+                                    <th>間歇性給藥</th>
+                                    <th>連續性給藥</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Cefazolin</strong></td>
+                                    <td>15 mg/kg daily (長留置)<br>20 mg/kg daily (短留置)</td>
+                                    <td>LD 500 mg/L<br>MD 125 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cefepime</strong></td>
+                                    <td>1000 mg daily</td>
+                                    <td>LD 500 mg/L<br>MD 125 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cefoperazone</strong></td>
+                                    <td class="no-data">無資料</td>
+                                    <td>LD 500 mg/L<br>MD 62.5-125 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cefotaxime</strong></td>
+                                    <td>500-1000 mg daily</td>
+                                    <td class="no-data">無資料</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ceftazidime</strong></td>
+                                    <td>1000-1500 mg daily (長留置)<br>20 mg/kg daily (短留置)</td>
+                                    <td>LD 500 mg/L<br>MD 125 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ceftriaxone</strong></td>
+                                    <td>1000 mg daily</td>
+                                    <td class="no-data">無資料</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Penicillins -->
+                    <div class="antibiotic-group">
+                        <h4>青黴素類 (Penicillins)</h4>
+                        <table class="dose-table">
+                            <thead>
+                                <tr>
+                                    <th>抗生素</th>
+                                    <th>間歇性給藥</th>
+                                    <th>連續性給藥</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Penicillin G</strong></td>
+                                    <td class="no-data">無資料</td>
+                                    <td>LD 50,000 unit/L<br>MD 25,000 unit/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Amoxicillin</strong></td>
+                                    <td class="no-data">無資料</td>
+                                    <td>MD 150 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ampicillin</strong></td>
+                                    <td>4 gm daily</td>
+                                    <td>MD 125 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ampicillin/sulbactam</strong></td>
+                                    <td class="no-data">無資料</td>
+                                    <td>LD 1000 mg/500 mg<br>MD 133.3 mg/66.7 mg</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Piperacillin/tazobactam</strong></td>
+                                    <td class="no-data">無資料</td>
+                                    <td>LD 4 gm/0.5 gm<br>MD 1 gm/0.125 gm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ticarcillin/clavulanic acid</strong></td>
+                                    <td class="no-data">無資料</td>
+                                    <td>LD 3 gm/0.2 gm<br>MD 300 mg/20 mg/L</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Others -->
+                    <div class="antibiotic-group">
+                        <h4>其他抗生素 (Others)</h4>
+                        <table class="dose-table">
+                            <thead>
+                                <tr>
+                                    <th>抗生素</th>
+                                    <th>間歇性給藥</th>
+                                    <th>連續性給藥</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Aztreonam</strong></td>
+                                    <td>2 gm daily</td>
+                                    <td>LD 500 mg/L<br>MD 250 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ciprofloxacin</strong></td>
+                                    <td class="no-data">無資料</td>
+                                    <td>MD 50 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Clindamycin</strong></td>
+                                    <td class="no-data">無資料</td>
+                                    <td>MD 600 mg/bag</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Daptomycin</strong></td>
+                                    <td>300 mg daily</td>
+                                    <td>LD 100 mg/L<br>MD 20 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fosfomycin</strong></td>
+                                    <td>4 g daily</td>
+                                    <td class="no-data">無資料</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Imipenem/cilastatin</strong></td>
+                                    <td>500 mg in alternate exchange</td>
+                                    <td>LD 250 mg/L<br>MD 50 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ofloxacin</strong></td>
+                                    <td class="no-data">無資料</td>
+                                    <td>LD 200 mg<br>MD 25 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Polymyxin B</strong></td>
+                                    <td class="no-data">無資料</td>
+                                    <td>MD 300,000 unit (30 mg)/bag</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Quinupristin/dalfopristin</strong></td>
+                                    <td>25 mg/L in alternate exchanges</td>
+                                    <td class="no-data">無資料</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Meropenem</strong></td>
+                                    <td>500 mg daily (APD長留置)<br>1000 mg daily (CAPD短留置)</td>
+                                    <td>MD 125 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Teicoplanin</strong></td>
+                                    <td>15 mg/kg every 5 days</td>
+                                    <td>LD 400 mg/bag<br>MD 20 mg/L</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Vancomycin</strong></td>
+                                    <td>15-30 mg/kg every 5-7 days (CAPD)<br>15 mg/kg every 4 days (APD)</td>
+                                    <td>LD 20-25 mg/kg<br>MD 25 mg/L</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Antifungal -->
+                    <div class="antibiotic-group">
+                        <h4>抗真菌藥 (Antifungal)</h4>
+                        <table class="dose-table">
+                            <thead>
+                                <tr>
+                                    <th>抗生素</th>
+                                    <th>間歇性給藥</th>
+                                    <th>連續性給藥</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Fluconazole</strong></td>
+                                    <td>IP 150-200 mg every 24-48 h<br><em class="note">口服給藥優先</em></td>
+                                    <td class="no-data">無資料</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Voriconazole</strong></td>
+                                    <td>IP 2.5 mg/kg daily<br><em class="note">口服給藥優先</em></td>
+                                    <td class="no-data">無資料</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="dose-legend">
+                        <p><strong>縮寫說明：</strong></p>
+                        <ul>
+                            <li>LD = Loading Dose (負荷劑量)</li>
+                            <li>MD = Maintenance Dose (維持劑量)</li>
+                            <li>CAPD = Continuous Ambulatory Peritoneal Dialysis</li>
+                            <li>APD = Automated Peritoneal Dialysis</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="stats" id="stats">顯示 28 個重點卡片</div>
+        <div class="cards-grid" id="cardsContainer">
+            <!-- Card 1 -->
+            <div class="card" data-search="診斷標準 腹膜炎 白細胞 WBC 培養 peritonitis diagnosis">
+                <div class="card-header">
+                    <div class="card-number">1</div>
+                    <h3 class="card-title">腹膜炎診斷標準</h3>
+                    <div class="card-summary">
+                        <p>至少符合以下<span class="important">兩項</span>即可診斷：</p>
+                        <ul>
+                            <li>臨床症狀：腹痛和/或混濁透析液</li>
+                            <li>透析液WBC > <span class="highlight">100/μL</span>（停留≥2小時）</li>
+                            <li>透析液培養陽性</li>
+                        </ul>
+                        <span class="recommendation-level level-1">1C級推薦</span>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>詳細診斷要點</h4>
+                            <ul>
+                                <li>WBC中需>50%為polymorphonuclear (PMN)</li>
+                                <li>APD患者因快速循環，應更重視PMN百分比而非絕對WBC計數</li>
+                                <li>無透析液的APD患者：注入1L透析液，停留2小時後檢查</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>鑑別診斷</h4>
+                            <p>混濁透析液的其他原因：</p>
+                            <ul>
+                                <li>Eosinophilia（嗜酸性球增多）</li>
+                                <li>化學性腹膜炎（如icodextrin）</li>
+                                <li>Hemoperitoneum（血性腹膜炎）</li>
+                                <li>惡性腫瘤（lymphoma、peritoneal metastasis）</li>
+                                <li>Fibrin、triglycerides（乳白色）</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 臨床要點</div>
+                            <p>腹部X光通常不需要，約1/3的CAPD患者有pneumoperitoneum（正常現象）。除非臨床sepsis或immunosuppression，否則不需要血液培養。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="card" data-search="目標 發生率 培養陰性 無腹膜炎 target rate">
+                <div class="card-header">
+                    <div class="card-number">2</div>
+                    <h3 class="card-title">2022年新目標建議</h3>
+                    <div class="card-summary">
+                        <ul>
+                            <li>總體腹膜炎率：<span class="highlight">≤0.40次/患者年</span></li>
+                            <li>無腹膜炎患者比例：<span class="highlight">>80%/年</span></li>
+                            <li>培養陰性率：<span class="highlight"><15%</span></li>
+                        </ul>
+                        <span class="recommendation-level level-1">1C級推薦</span>
+                        <div class="tag">更新重點</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>與2016年指南的比較</h4>
+                            <ul>
+                                <li>腹膜炎率目標從0.5降至0.40次/患者年（更嚴格）</li>
+                                <li>新增無腹膜炎患者比例指標</li>
+                                <li>基於全球數據分析，此目標可達成</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>國際差異</h4>
+                            <p>PDOPPS研究顯示：</p>
+                            <ul>
+                                <li>美國：0.26次/患者年</li>
+                                <li>泰國：0.40次/患者年</li>
+                                <li>中國某些中心：0.16-0.20次/患者年</li>
+                                <li>全球差異高達20倍</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 實踐建議</div>
+                            <p>系統性回顧顯示，1992-2019年間全球腹膜炎率從0.60降至0.30次/患者年，證明持續改進是可能的。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="card" data-search="定義 難治性 復發 再發 分類 refractory recurrent relapsing">
+                <div class="card-header">
+                    <div class="card-number">3</div>
+                    <h3 class="card-title">修訂的腹膜炎分類定義</h3>
+                    <div class="card-summary">
+                        <ul>
+                            <li><strong>Refractory</strong>：適當抗生素5天後仍混濁</li>
+                            <li><strong>Recurrent</strong>：治療結束4週內，不同病原體</li>
+                            <li><strong>Relapsing</strong>：治療結束4週內，相同病原體</li>
+                        </ul>
+                        <span class="recommendation-level level-ng">專家共識</span>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>完整定義列表</h4>
+                            <ul>
+                                <li><strong>Repeat</strong>：治療結束4週後，相同病原體</li>
+                                <li><strong>Pre-PD peritonitis</strong>：導管植入後、開始PD前發生（發生率4.2%）</li>
+                                <li><strong>Catheter-related peritonitis</strong>：3個月內與exit-site/tunnel infection相關，相同病原體</li>
+                                <li><strong>Enteric peritonitis</strong>：來自腸道源（inflammation、perforation、ischemia）</li>
+                                <li><strong>Medical cure</strong>：完全緩解且無併發症（新定義）</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>預後差異</h4>
+                            <ul>
+                                <li>Relapsing peritonitis：治癒率較低，ultrafiltration問題多，技術失敗率高</li>
+                                <li>Recurrent peritonitis：預後比relapsing更差</li>
+                                <li>大型PD中心的relapsing/recurrent率較低</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 臨床意義</div>
+                            <p>準確分類有助於制定治療策略。例如，relapsing peritonitis可能需要考慮同步導管更換，而recurrent可能提示抗生素選擇或療程不當。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="card" data-search="預防 導管 植入 抗生素 cefuroxime vancomycin prophylaxis">
+                <div class="card-header">
+                    <div class="card-number">4</div>
+                    <h3 class="card-title">導管植入時的預防</h3>
+                    <div class="card-summary">
+                        <p>導管植入前<span class="important">立即</span>給予全身性預防性抗生素</p>
+                        <ul>
+                            <li>First-generation cephalosporin（如cefazolin）</li>
+                            <li>MRSA高盛行區：考慮vancomycin</li>
+                        </ul>
+                        <span class="recommendation-level level-1">1A級推薦</span>
+                        <div class="tag">預防措施</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>實證基礎</h4>
+                            <p>4個RCT研究證實預防性抗生素的效益：</p>
+                            <ul>
+                                <li>Cefuroxime、gentamicin、vancomycin、cefazolin均有效</li>
+                                <li>系統性回顧證實可降低腹膜炎風險</li>
+                                <li>對exit-site/tunnel infection的預防效果不確定</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>抗生素選擇考量</h4>
+                            <ul>
+                                <li>First-generation cephalosporin效果略低於vancomycin，但仍常用</li>
+                                <li>需考慮vancomycin resistance問題</li>
+                                <li>各中心應根據當地antimicrobial resistance pattern決定</li>
+                                <li>Catheter insertion-related peritonitis應<5%</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 實務建議</div>
+                            <p>目前無S. aureus nasal carriage篩檢和decolonization的效益證據。重點是在手術開始前給予預防性抗生素。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 5 -->
+            <div class="card" data-search="污染 濕污染 乾污染 預防 處理 contamination wet dry">
+                <div class="card-header">
+                    <div class="card-number">5</div>
+                    <h3 class="card-title">PD系統污染處理</h3>
+                    <div class="card-summary">
+                        <p><strong>Wet contamination</strong>（開放系統）需預防性抗生素</p>
+                        <p><strong>Dry contamination</strong>（閉合系統外）不需預防</p>
+                        <span class="recommendation-level level-2">2D級推薦</span>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>Wet contamination定義與處理</h4>
+                            <p>開放系統污染，包括：</p>
+                            <ul>
+                                <li>透析液袋洩漏</li>
+                                <li>管路破損或洩漏（clamp近端）</li>
+                                <li>無菌技術破壞</li>
+                                <li>連接時touch contamination</li>
+                            </ul>
+                            <p><strong>處理步驟：</strong></p>
+                            <ol>
+                                <li>立即更換sterile transfer set</li>
+                                <li>獲取PD effluent進行cell count和culture</li>
+                                <li>給予預防性抗生素（IP cefazolin單次）</li>
+                                <li>密切監測（熱帶地區需更長觀察期）</li>
+                            </ol>
+                        </div>
+                        <div class="detail-section">
+                            <h4>實證數據</h4>
+                            <ul>
+                                <li>548例touch contamination研究：總體腹膜炎率3.1%</li>
+                                <li>僅wet contamination導致腹膜炎（5.6%）</li>
+                                <li>多為coagulase-negative staphylococci或culture-negative</li>
+                                <li>預防性抗生素顯著降低風險</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 臨床判斷</div>
+                            <p>如不確定tubing clamp是否關閉，應視為wet contamination處理。口服fluoroquinolones曾被使用，但FDA現已不建議（除非無其他選擇）。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 6 -->
+            <div class="card" data-search="結腸鏡 婦科 操作 預防 抗生素 colonoscopy gynecological">
+                <div class="card-header">
+                    <div class="card-number">6</div>
+                    <h3 class="card-title">侵入性操作的預防</h3>
+                    <div class="card-summary">
+                        <p><strong>Colonoscopy</strong>（2C）：預防性抗生素+排空腹腔</p>
+                        <p><strong>Gynecological procedures</strong>（2D）：風險最高，必須預防</p>
+                        <p><strong>Gastroscopy</strong>：證據不足</p>
+                        <div class="tag">高風險操作</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>Colonoscopy</h4>
+                            <ul>
+                                <li>無預防腹膜炎率：3.4-8.5%</li>
+                                <li>治療性操作（polypectomy）風險更高</li>
+                                <li>主要病原體：E. coli（>50%）</li>
+                                <li><strong>預防方案：</strong>
+                                    <ul>
+                                        <li>IV：ceftriaxone、ceftazidime、amoxicillin-clavulanate</li>
+                                        <li>口服：ampicillin 1g + ciprofloxacin 500mg + metronidazole 250mg</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Gynecological procedures</h4>
+                            <ul>
+                                <li>腹膜炎風險：26.9-38.5%（最高）</li>
+                                <li>常見病原體：Streptococcus、E. coli、Enterococcus、Candida</li>
+                                <li>預防性抗生素可降低風險47%→0%</li>
+                                <li><strong>建議方案：</strong>IV cefazolin或ceftriaxone，或oral cefadroxil 500mg×3天</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Gastroscopy</h4>
+                            <ul>
+                                <li>腹膜炎發生率：3.9%</li>
+                                <li>風險因素：年齡、biopsy次數</li>
+                                <li>證據不足以常規建議預防</li>
+                                <li>7天內使用抗生素可能有保護作用</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 排空腹腔的重要性</div>
+                            <p>透析液會抑制macrophage和PMN功能，高容量會破壞volume/surface area ratio，降低bacterial killing效率。因此操作前排空腹腔可增強host defense。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 7 -->
+            <div class="card" data-search="訓練 再培訓 技術 評估 training retraining">
+                <div class="card-header">
+                    <div class="card-number">7</div>
+                    <h3 class="card-title">訓練與再培訓計劃</h3>
+                    <div class="card-summary">
+                        <p>定期評估和更新PD技術，強調<span class="highlight">直接觀察操作</span></p>
+                        <p>再培訓時機：腹膜炎後、住院後、能力改變時</p>
+                        <span class="recommendation-level level-1">1C級推薦</span>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>再培訓指征（表3）</h4>
+                            <ul>
+                                <li>長期住院後</li>
+                                <li>Peritonitis和/或catheter infection後</li>
+                                <li>Dexterity、vision或mental acuity改變後</li>
+                                <li>更換supplier或connection type後</li>
+                                <li>PD exchange caregiver更換後</li>
+                                <li>PD中斷後（如暫時HD期間）</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>實證支持</h4>
+                            <ul>
+                                <li>6個月後約50%患者會走捷徑或偏離標準步驟</li>
+                                <li>RCT顯示頻繁再培訓（每1-3個月）可降低peritonitis rate</li>
+                                <li>Technique inspection比knowledge testing更重要</li>
+                                <li>每2個月technique inspection可降低non-enteric peritonitis風險</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>培訓方式演進</h4>
+                            <ul>
+                                <li>Distance learning和remote monitoring增加</li>
+                                <li>Hybrid education（線上影片+實體）降低peritonitis rate</li>
+                                <li>Face-to-face contact<2個月與較高peritonitis rate相關</li>
+                                <li>Home visit可發現技術問題和環境風險</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 最佳實踐</div>
+                            <p>最有效的學習是在操作後立即給予direct feedback。強調practical assessment而非theoretical knowledge，因為患者可能不知道自己的錯誤。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 8 -->
+            <div class="card" data-search="寵物 貓 狗 巴斯德菌 預防 pets pasteurella">
+                <div class="card-header">
+                    <div class="card-number">8</div>
+                    <h3 class="card-title">寵物相關預防措施</h3>
+                    <div class="card-summary">
+                        <p>約20% PD患者飼養寵物</p>
+                        <ul>
+                            <li>寵物<span class="important">禁止</span>進入PD操作房間</li>
+                            <li>不可接觸透析設備</li>
+                        </ul>
+                        <span class="recommendation-level level-1">1C級推薦</span>
+                        <div class="tag">生活管理</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>寵物相關病原體</h4>
+                            <ul>
+                                <li><strong>Pasteurella multocida</strong>
+                                    <ul>
+                                        <li>超過40例報告</li>
+                                        <li>存在於貓狗的upper respiratory tract和oral cavity</li>
+                                        <li>貓爪也可帶菌</li>
+                                        <li>誤稱"cat-bite peritonitis"（不一定需要咬傷）</li>
+                                    </ul>
+                                </li>
+                                <li>其他：Capnocytophaga、Neisseria species</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>APD患者風險更高</h4>
+                            <ul>
+                                <li>較長的tubing增加接觸機會</li>
+                                <li>Cycler pump的移動吸引貓玩耍</li>
+                                <li>貓喜歡cycler heat plate的溫暖</li>
+                                <li>夜間患者睡著時的隱藏損害</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>預防策略</h4>
+                            <ul>
+                                <li>嚴格hand hygiene（處理寵物前後）</li>
+                                <li>高標準home environment hygiene</li>
+                                <li>檢查tubing是否有pinhole damage（不易發現）</li>
+                                <li>教育患者pet-related risk</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 平衡考量</div>
+                            <p>寵物對患者的emotional support和quality of life很重要，不建議強制放棄。重點是建立安全界限和良好習慣。注意hamster、parrot等其他寵物也有風險。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 9 -->
+            <div class="card" data-search="低血鉀 H2阻斷劑 危險因素 預防 hypokalemia H2 blocker">
+                <div class="card-header">
+                    <div class="card-number">9</div>
+                    <h3 class="card-title">可改變的危險因素</h3>
+                    <div class="card-summary">
+                        <p><strong>Hypokalemia</strong>：持續4個月→風險增加<span class="highlight">80%</span></p>
+                        <p><strong>H2-receptor antagonist</strong>：enteric peritonitis HR <span class="highlight">1.67</span></p>
+                        <span class="recommendation-level level-2">2C級推薦</span>
+                        <div class="tag">風險管理</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>Hypokalemia詳細資訊</h4>
+                            <ul>
+                                <li>PDOPPS國際數據證實風險關聯</li>
+                                <li>主要導致gram-positive和culture-negative peritonitis</li>
+                                <li>巴西研究：增加infection-related mortality</li>
+                                <li>持續時間與風險程度相關</li>
+                                <li><strong>主因：</strong>飲食potassium攝取不足（非排泄增加）</li>
+                                <li><strong>建議：</strong>dietary intervention優於藥物補充</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>胃酸抑制劑風險</h4>
+                            <ul>
+                                <li><strong>H2-receptor antagonists：</strong>
+                                    <ul>
+                                        <li>增加enteric peritonitis風險（HR 1.67）</li>
+                                        <li>增加infectious mortality</li>
+                                        <li>Gastroscopy後peritonitis率：9.4% vs 2.9%</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Proton pump inhibitors (PPI)：</strong>
+                                    <ul>
+                                        <li>風險證據不一致</li>
+                                        <li>有其他顧慮（如Clostridioides difficile infection）</li>
+                                        <li>不建議從H2 antagonist轉換為PPI</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>其他危險因素</h4>
+                            <ul>
+                                <li>Constipation和enteritis：與enteric organisms相關</li>
+                                <li>Gastrointestinal bleeding：PDOPPS顯示增加風險</li>
+                                <li>規律使用lactulose可能降低peritonitis rate（觀察性數據）</li>
+                                <li>Lactulose vs sennosides的RCT未證實益處</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 臨床應用</div>
+                            <p>雖無強力證據證明治療這些因素可降低peritonitis，但基於其他健康理由仍應處理。Meta-analysis 6項研究證實H2 antagonist風險（OR 1.4）。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 10 -->
+            <div class="card" data-search="經驗性 抗生素 頭孢 萬古黴素 氨基糖苷 empirical antibiotics cephalosporin vancomycin aminoglycoside">
+                <div class="card-header">
+                    <div class="card-number">10</div>
+                    <h3 class="card-title">經驗性抗生素選擇</h3>
+                    <div class="card-summary">
+                        <p>必須覆蓋gram-positive和gram-negative菌</p>
+                        <p class="important">延遲治療每小時增加5.5%失敗率！</p>
+                        <span class="recommendation-level level-1">1B級推薦</span>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>標準組合治療</h4>
+                            <ul>
+                                <li><strong>Gram-positive覆蓋：</strong>
+                                    <ul>
+                                        <li>Cefazolin（首選，除非MRSA高盛行）</li>
+                                        <li>Vancomycin（MRSA高盛行區）</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Gram-negative覆蓋：</strong>
+                                    <ul>
+                                        <li>Third-generation cephalosporin（ceftazidime）</li>
+                                        <li>Aminoglycosides（gentamicin）</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>單一療法選擇</h4>
+                            <ul>
+                                <li><strong>Cefepime：</strong>
+                                    <ul>
+                                        <li>2個RCT和1個observational study支持</li>
+                                        <li>Initial response rate>80%</li>
+                                        <li>Non-inferiority study證實與dual therapy相當</li>
+                                    </ul>
+                                </li>
+                                <li><strong>不建議：</strong>Quinolone monotherapy（resistance顧慮）</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>時效性的重要證據</h4>
+                            <ul>
+                                <li>西澳研究（159例）：每延遲1小時，30天failure/death風險增加5.5%</li>
+                                <li>日本研究（109例）：延遲24小時，catheter removal風險增加3倍</li>
+                                <li>如預期延遲（如emergency department等待），先給予systemic antibiotics</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>PDOPPS真實世界數據</h4>
+                            <ul>
+                                <li>Empirical cefazolin vs vancomycin：cure rate無差異</li>
+                                <li>Gram-negative peritonitis：aminoglycoside優於ceftazidime</li>
+                                <li>完整覆蓋gram-positive和gram-negative的中心有更高cure rate</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 實務要點</div>
+                            <p>無單一方案證明優於其他。選擇應基於local epidemiology。記住：時間比完美的antibiotic selection更重要！</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 11 -->
+            <div class="card" data-search="腹腔內 IP 劑量 給藥 APD CAPD intraperitoneal dosing">
+                <div class="card-header">
+                    <div class="card-number">11</div>
+                    <h3 class="card-title">抗生素給藥原則</h3>
+                    <div class="card-summary">
+                        <p><strong>Intraperitoneal給藥優先</strong>（除非sepsis）</p>
+                        <p class="important">Residual kidney function>100mL/天：cephalosporin劑量+25%</p>
+                        <span class="recommendation-level level-1">1B級推薦</span>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>主要抗生素IP劑量（表5）</h4>
+                            <ul>
+                                <li><strong>Vancomycin：</strong>
+                                    <ul>
+                                        <li>CAPD：15-30mg/kg q5-7天</li>
+                                        <li>APD：15mg/kg q4天</li>
+                                        <li>Continuous：LD 20-25mg/kg，MD 25mg/L</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Cefazolin：</strong>
+                                    <ul>
+                                        <li>Intermittent：15mg/kg/天（long dwell）；20mg/kg/天（short dwell）</li>
+                                        <li>Continuous：LD 500mg/L，MD 125mg/L</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Gentamicin：</strong>0.6mg/kg/天（僅intermittent dosing）</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Residual kidney function的影響</h4>
+                            <ul>
+                                <li>Urine volume>100mL/天：cephalosporin增加25%劑量</li>
+                                <li>Creatinine clearance>5mL/min：treatment failure rate更高</li>
+                                <li>原因：antibiotic clearance增加，time above MIC縮短</li>
+                                <li>Time-dependent killing drugs（如cephalosporins）特別受影響</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>APD特殊考慮</h4>
+                            <ul>
+                                <li>Drug clearance更高，half-life更短</li>
+                                <li>最短dwell time：4-6小時</li>
+                                <li>Vancomycin bioavailability與dwell time相關</li>
+                                <li>可考慮暫時轉為CAPD</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Vancomycin監測爭議</h4>
+                            <ul>
+                                <li>Fixed dosing vs target-guided dosing仍有爭議</li>
+                                <li>60%患者初始trough level<15mg/L，但後續均達標</li>
+                                <li>第5天（非第3天）<10.1mg/L與較差預後相關</li>
+                                <li>AUC-guided可能優於trough level monitoring</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 給藥路徑選擇</div>
+                            <p>IP vancomycin吸收率90%。Cochrane review證實IP優於IV。延遲IP給藥時可先給予systemic antibiotics，但應儘快轉為IP。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 12 -->
+            <div class="card" data-search="耳毒性 N-乙醯半胱氨酸 氨基糖苷 預防 ototoxicity N-acetylcysteine aminoglycoside">
+                <div class="card-header">
+                    <div class="card-number">12</div>
+                    <h3 class="card-title">耳毒性預防新建議</h3>
+                    <div class="card-summary">
+                        <p>使用aminoglycosides時輔助<span class="highlight">N-acetylcysteine</span></p>
+                        <p>劑量：600mg PO BID</p>
+                        <span class="recommendation-level level-2">2B級推薦</span>
+                        <div class="tag">新增建議</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>Ototoxicity風險因素</h4>
+                            <ul>
+                                <li>年齡較大</li>
+                                <li>Peritonitis發作次數</li>
+                                <li>Amikacin和vancomycin累積劑量</li>
+                                <li>即使therapeutic concentration範圍內也可能發生</li>
+                                <li>可能導致vestibular或cochlear damage</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>N-acetylcysteine的證據</h4>
+                            <ul>
+                                <li><strong>3個RCT證實效益：</strong>
+                                    <ul>
+                                        <li>最大研究：60例CAPD患者</li>
+                                        <li>顯著保護high-frequency hearing function</li>
+                                        <li>第1週和第4週評估均有效</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Meta-analysis：</strong>RR 0.14 (95% CI 0.05-0.45)</li>
+                                <li>HD患者研究也證實保護作用</li>
+                                <li>尚未評估vestibular function保護</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Aminoglycosides使用原則</h4>
+                            <ul>
+                                <li>Once-daily dosing（concentration-dependent killing）</li>
+                                <li>避免prolonged use（1C推薦）</li>
+                                <li>RCT證實不加速residual kidney function喪失</li>
+                                <li>76%的IP gentamicin被吸收（inflammation期更高）</li>
+                                <li>有alternative時及早switch</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 機轉與應用</div>
+                            <p>Ototoxicity機轉：inner ear的reactive oxygen species damage。預防勝於治療，因為ototoxicity可能irreversible。即使small sample size研究，基於low risk和potential benefit，合理考慮使用。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 13 -->
+            <div class="card" data-search="金黃色葡萄球菌 MRSA MSSA 治療 S. aureus treatment">
+                <div class="card-header">
+                    <div class="card-number">13</div>
+                    <h3 class="card-title">S. aureus腹膜炎治療</h3>
+                    <div class="card-summary">
+                        <p>治療<span class="highlight">3週</span>（2C）</p>
+                        <p>MSSA：first-generation cephalosporin；MRSA：Vancomycin</p>
+                        <p>可加用Rifampicin降低復發</p>
+                        <span class="recommendation-level level-2">2C級推薦</span>
+                        <div class="tag">特定病原體</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>S. aureus培養陽性後的治療流程</h4>
+                            <ol>
+                                <li><strong>停止gram-negative覆蓋</strong>，繼續gram-positive抗生素</li>
+                                <li><strong>根據藥敏調整：</strong>
+                                    <ul>
+                                        <li>MSSA：繼續first-generation cephalosporin</li>
+                                        <li>MRSA：改用vancomycin</li>
+                                    </ul>
+                                </li>
+                                <li><strong>第3天評估：</strong>
+                                    <ul>
+                                        <li>臨床狀況</li>
+                                        <li>重複透析液cell count和culture</li>
+                                    </ul>
+                                </li>
+                                <li><strong>根據第5天反應決定：</strong>
+                                    <ul>
+                                        <li>臨床改善→繼續IP抗生素共21天</li>
+                                        <li>無改善→拔除PD導管，拔管後繼續治療14天</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                        <div class="detail-section">
+                            <h4>治療細節</h4>
+                            <ul>
+                                <li><strong>MSSA：</strong>First-generation cephalosporin是首選</li>
+                                <li><strong>MRSA：</strong>IP vancomycin</li>
+                                <li><strong>輔助治療：</strong>Rifampicin 5-7天（降低50% relapse risk）</li>
+                                <li><strong>總療程：</strong>
+                                    <ul>
+                                        <li>保留導管：IP治療21天</li>
+                                        <li>拔除導管：拔管後再治療14天</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>大型研究結果</h4>
+                            <ul>
+                                <li>兩項retrospective studies（>700例）：vancomycin vs cefazolin初始治療結果相似</li>
+                                <li>常繼發於exit-site或tunnel infection</li>
+                                <li>也可能因touch contamination</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>特殊情況</h4>
+                            <ul>
+                                <li>合併exit-site/tunnel infection：考慮catheter removal</li>
+                                <li>Vancomycin反應不佳：IP daptomycin ± oral rifampicin</li>
+                                <li>Teicoplanin不建議（PD fluid中對MRSA biofilm活性受損）</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 關鍵決策點</div>
+                            <p>第5天是關鍵評估時間點。如果使用適當抗生素5天後仍無臨床改善，應考慮拔除導管。記住：S. aureus peritonitis的5天無反應是catheter removal的明確指征之一。合併catheter infection時預後較差，應及早評估。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 14 - Streptococcus and Other Gram-positive -->
+            <div class="card" data-search="鏈球菌 革蘭氏陽性 CNS 治療 Streptococcus gram-positive coagulase-negative">
+                <div class="card-header">
+                    <div class="card-number">14</div>
+                    <h3 class="card-title">Streptococcus及其他Gram-positive菌治療</h3>
+                    <div class="card-summary">
+                        <p>Streptococcus spp.治療<span class="highlight">2週</span></p>
+                        <p>Coagulase-negative staphylococci等其他GP菌標準2週療程</p>
+                        <p>第5天無改善需拔管</p>
+                        <span class="recommendation-level level-2">2C級推薦</span>
+                        <div class="tag">特定病原體</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>Streptococcus培養陽性後的處理流程</h4>
+                            <ol>
+                                <li><strong>繼續IP cefazolin</strong>，停止gram-negative覆蓋</li>
+                                <li><strong>過敏或抗藥性處理：</strong>
+                                    <ul>
+                                        <li>Penicillin/cephalosporin過敏或抗藥：改用vancomycin</li>
+                                        <li>重複同樣處理步驟（圖中重複可能為強調）</li>
+                                    </ul>
+                                </li>
+                                <li><strong>第3天評估</strong>（雖圖中未顯示，但標準流程應包含）</li>
+                                <li><strong>第5天決策：</strong>
+                                    <ul>
+                                        <li>臨床改善→繼續IP抗生素14天</li>
+                                        <li>無改善→拔除PD導管，拔管後再治療14天</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                        <div class="detail-section">
+                            <h4>其他Gram-positive菌的處理</h4>
+                            <p>包括coagulase-negative staphylococci (CNS)等：</p>
+                            <ol>
+                                <li><strong>繼續gram-positive覆蓋</strong>，根據藥敏選擇</li>
+                                <li><strong>停止gram-negative覆蓋</strong></li>
+                                <li><strong>第3天評估：</strong>
+                                    <ul>
+                                        <li>臨床改善情況</li>
+                                        <li>重複透析液cell count和culture</li>
+                                    </ul>
+                                </li>
+                                <li><strong>標準療程：</strong>14天</li>
+                            </ol>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Streptococcus species特點</h4>
+                            <ul>
+                                <li><strong>Viridans streptococci：</strong>
+                                    <ul>
+                                        <li>可能來自口腔源（提示dental care重要性）</li>
+                                        <li>通常對penicillin/cephalosporin敏感</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Beta-hemolytic streptococci：</strong>
+                                    <ul>
+                                        <li>毒力較強，可能造成嚴重感染</li>
+                                        <li>需密切監測臨床反應</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Enterococci：</strong>
+                                    <ul>
+                                        <li>需要ampicillin或vancomycin</li>
+                                        <li>常見於腸道源相關感染</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>CNS腹膜炎特點</h4>
+                            <ul>
+                                <li>最常見原因：touch contamination</li>
+                                <li>通常預後良好，但需完整療程</li>
+                                <li>約20-30%可能methicillin-resistant</li>
+                                <li>治療失敗可能提示biofilm形成或catheter colonization</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 臨床決策要點</div>
+                            <p>雖然Streptococcus和CNS通常預後較好，但第5天評估仍然關鍵。持續混濁或臨床惡化需考慮：(1)是否有未識別的抗藥性，(2)是否有catheter biofilm，(3)是否需要拔管。注意enterococci可能需要不同的抗生素方案。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 15 (原Card 14) -->
+            <div class="card" data-search="假單胞菌 Pseudomonas 治療 拔管 treatment">
+                <div class="card-header">
+                    <div class="card-number">15</div>
+                    <h3 class="card-title">Pseudomonas腹膜炎處理</h3>
+                    <div class="card-summary">
+                        <p>預後差，complete cure rate<50%</p>
+                        <p>使用<span class="highlight">2種</span>不同機制抗生素×3週</p>
+                        <p>5天無反應或合併tunnel infection：catheter removal</p>
+                        <span class="recommendation-level level-2">2C級推薦</span>
+                        <div class="tag">高危病原體</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>流行病學與預後</h4>
+                            <ul>
+                                <li>主要為Pseudomonas aeruginosa</li>
+                                <li>Return to PD rate<40%</li>
+                                <li>Early removal比delayed removal有更高的PD return機會</li>
+                                <li>Catheter removal與較低mortality risk相關</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>治療策略</h4>
+                            <ul>
+                                <li><strong>Dual therapy優於monotherapy</strong>（observational studies）</li>
+                                <li><strong>Triple therapy無額外益處</strong></li>
+                                <li>高biofilm production rate解釋治療困難</li>
+                                <li>長期antibiotic治療導致residual kidney function顯著下降</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Catheter removal指征</h4>
+                            <ul>
+                                <li>5天appropriate treatment無clinical response（2D）</li>
+                                <li>合併exit-site或tunnel infection（2D）</li>
+                                <li>不建議使用triple antibiotics企圖salvage</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 決策要點</div>
+                            <p>Pseudomonas peritonitis常需要困難的決定。早期識別treatment failure並及時catheter removal，而非延長antibiotic treatment，可能保留未來return to PD的機會。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 16 (原Card 15) -->
+            <div class="card" data-search="真菌 念珠菌 拔管 抗真菌 fungal candida">
+                <div class="card-header">
+                    <div class="card-number">16</div>
+                    <h3 class="card-title">真菌性腹膜炎處理</h3>
+                    <div class="card-summary">
+                        <p class="important">立即catheter removal！（1C）</p>
+                        <p>未拔管mortality 50-91%</p>
+                        <p>Antifungal治療至少2週（拔管後）</p>
+                        <span class="recommendation-level level-1">1C級推薦</span>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>病原體分布</h4>
+                            <ul>
+                                <li>最常見：Candida albicans和C. parapsilosis</li>
+                                <li>C. parapsilosis頻率可能超過C. albicans</li>
+                                <li>Aspergillus較少見但更嚴重</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Antifungal drug選擇</h4>
+                            <ul>
+                                <li><strong>C. albicans：</strong>Fluconazole（首選）</li>
+                                <li><strong>其他Candida：</strong>可能需要echinocandins或voriconazole</li>
+                                <li><strong>Echinocandins：</strong>必須IV（PD fluid損害其活性）</li>
+                                <li><strong>Voriconazole：</strong>oral優先（避免IV vehicle累積）</li>
+                                <li><strong>Aspergillus：</strong>IV amphotericin B或newer azoles</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Catheter removal的重要性</h4>
+                            <ul>
+                                <li>即使有newer drugs，removal仍是關鍵</li>
+                                <li>Early vs late removal的益處有爭議</li>
+                                <li>高biofilm production支持immediate removal</li>
+                                <li>Removal可降低mortality 2-3倍</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>預後</h4>
+                            <ul>
+                                <li>Return to PD中位時間：15週</li>
+                                <li><1/3患者可return to PD</li>
+                                <li>治療時間：拔管後至少2週，有時需4週</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 關鍵訊息</div>
+                            <p>Fungal peritonitis是medical emergency。Gram stain可能早期識別fungal elements，不要等待culture結果。立即開始empirical antifungal治療並安排catheter removal。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 17 (原Card 16) -->
+            <div class="card" data-search="難治性 拔管 第5天 WBC趨勢 refractory">
+                <div class="card-header">
+                    <div class="card-number">17</div>
+                    <h3 class="card-title">難治性腹膜炎新觀點</h3>
+                    <div class="card-summary">
+                        <p>第5天仍混濁不一定需立即拔管</p>
+                        <p>觀察<span class="highlight">WBC下降趨勢</span></p>
+                        <p>約20%延遲反應但最終可治癒</p>
+                        <span class="recommendation-level level-2">2C級推薦</span>
+                        <div class="tag">更新觀念</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>傳統定義vs新觀點</h4>
+                            <ul>
+                                <li><strong>傳統：</strong>5天後仍混濁=refractory=catheter removal</li>
+                                <li><strong>新觀點：</strong>評估WBC dynamic trend</li>
+                                <li>644例研究顯示三種response patterns：
+                                    <ul>
+                                        <li>Early response</li>
+                                        <li>Delayed response（WBC下降但第5天仍>100/μL）</li>
+                                        <li>Treatment failure</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Delayed response的特徵</h4>
+                            <ul>
+                                <li>約20%的病例</li>
+                                <li>第5天WBC平均下降34%</li>
+                                <li>最終不需catheter removal即可治癒</li>
+                                <li>對lower virulence organisms可能需要less aggressive處理</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>臨床決策</h4>
+                            <ul>
+                                <li>避免"one-size-fits-all"的第5天規則</li>
+                                <li>考慮WBC decreasing trajectory</li>
+                                <li>但clinical deterioration時仍需及時removal</li>
+                                <li>平衡premature removal vs delayed treatment的風險</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 實務建議</div>
+                            <p>第5天決策應individualized。如果WBC呈downward trend且患者clinically stable，可考慮繼續觀察。這可能避免unnecessary technique failure。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 18 (原Card 17) -->
+            <div class="card" data-search="培養 技術 血培養瓶 離心 culture technique centrifuge">
+                <div class="card-header">
+                    <div class="card-number">18</div>
+                    <h3 class="card-title">優化培養技術</h3>
+                    <div class="card-summary">
+                        <p>床旁接種blood culture bottles</p>
+                        <p>Centrifugation技術提高yield</p>
+                        <p><span class="important">絕不可refrigerate！</span></p>
+                        <span class="recommendation-level level-1">1C級推薦</span>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>標準培養方法</h4>
+                            <ul>
+                                <li>床旁接種5-10mL至兩個blood culture bottles（aerobic+anaerobic）</li>
+                                <li>Culture-negative rate：10-20%（可接受）</li>
+                                <li>專業中心可達<10%</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>提高yield的技術</h4>
+                            <ul>
+                                <li><strong>Centrifugation技術：</strong>
+                                    <ul>
+                                        <li>50mL PD effluent，3000g×15分鐘</li>
+                                        <li>Sediment重懸於3-5mL supernatant</li>
+                                        <li>Yield提高5-10倍</li>
+                                    </ul>
+                                </li>
+                                <li><strong>其他方法：</strong>Water lysis、Tween-80 blood agar、Triton-X treatment</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>關鍵操作要點</h4>
+                            <ul>
+                                <li>6小時內送達laboratory</li>
+                                <li>無法立即送檢：37°C incubation</li>
+                                <li><span class="important">絕對禁止refrigeration或freezing</span>（會殺死或抑制microorganisms）</li>
+                                <li>Solid media：aerobic、microaerophilic、anaerobic環境</li>
+                                <li>Fungi：room temperature和35-37°C dual incubation</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Culture-negative的處理</h4>
+                            <ul>
+                                <li>3-5天仍negative：重複cell count、differential</li>
+                                <li>送fungal和mycobacterial culture</li>
+                                <li>延長培養3-4天（fastidious bacteria）</li>
+                                <li>Catheter culture可提高診斷率（特別是fungi、enterococci）</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 中心效應</div>
+                            <p>22個中心研究：immediate transfer和centrifugation技術與較低culture-negative rate相關。Experience很重要-大型中心culture-negative rate較低。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 19 (原Card 18) -->
+            <div class="card" data-search="抗真菌 預防 制黴菌素 氟康唑 antifungal prophylaxis nystatin fluconazole">
+                <div class="card-header">
+                    <div class="card-number">19</div>
+                    <h3 class="card-title">Antifungal預防策略</h3>
+                    <div class="card-summary">
+                        <p>所有使用antibiotics的PD患者均需預防</p>
+                        <p>Nystatin或Fluconazole</p>
+                        <p>可降低fungal peritonitis風險72%</p>
+                        <span class="recommendation-level level-1">1B級推薦</span>
+                        <div class="tag">二級預防</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>預防方案</h4>
+                            <ul>
+                                <li><strong>Nystatin：</strong>500,000 units QID</li>
+                                <li><strong>Fluconazole：</strong>200mg q48h</li>
+                                <li>治療期間全程使用</li>
+                                <li>適用於所有antibiotic使用（不限於peritonitis治療）</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>證據基礎</h4>
+                            <ul>
+                                <li>2個RCT + systematic review證實效益</li>
+                                <li>Cochrane meta-analysis：RR 0.28 (95% CI 0.12-0.63)</li>
+                                <li>多數fungal peritonitis前有antibiotic使用史</li>
+                                <li>包括治療exit-site/tunnel infection的antibiotics</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>藥物選擇考量</h4>
+                            <ul>
+                                <li><strong>Nystatin：</strong>
+                                    <ul>
+                                        <li>某些國家無法取得</li>
+                                        <li>需要QID給藥（compliance考量）</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Fluconazole：</strong>
+                                    <ul>
+                                        <li>Observational studies和1個RCT支持</li>
+                                        <li>潛在問題：drug interactions、resistance</li>
+                                        <li>給藥方便（q48h）</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 實施要點</div>
+                            <p>這是少數有strong evidence支持的preventive measures之一。應成為standard operating procedure的一部分。記得不只是peritonitis treatment，任何antibiotic使用都需要。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 20 (原Card 19) -->
+            <div class="card" data-search="監測 報告 品質 CQI 指標 monitoring quality">
+                <div class="card-header">
+                    <div class="card-number">20</div>
+                    <h3 class="card-title">監測與品質控制</h3>
+                    <div class="card-summary">
+                        <p>至少每年監測peritonitis指標</p>
+                        <p>每次peritonitis進行<span class="highlight">root cause analysis</span></p>
+                        <span class="recommendation-level level-1">1C級推薦</span>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>必須監測項目（每年）</h4>
+                            <ul>
+                                <li>Overall peritonitis rate（episodes/patient-year）</li>
+                                <li>Organism-specific peritonitis rates</li>
+                                <li>Antimicrobial susceptibilities</li>
+                                <li>Culture-negative rate（%）</li>
+                                <li>Treatment outcomes（cure、removal、death等）</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>建議額外監測（quarterly）</h4>
+                            <ul>
+                                <li>Mean time to first peritonitis</li>
+                                <li>Percentage of patients free of peritonitis</li>
+                                <li>Pre-PD peritonitis</li>
+                                <li>Catheter insertion-related peritonitis</li>
+                                <li>Medical cure rate</li>
+                                <li>Recurrent/relapsing rate</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Root cause analysis</h4>
+                            <ul>
+                                <li>每次peritonitis都是preventable event</li>
+                                <li>分析內容：
+                                    <ul>
+                                        <li>Organism來源（如S. viridans→dental problems）</li>
+                                        <li>技術問題（coagulase-negative staphylococci→contamination）</li>
+                                        <li>Environmental factors</li>
+                                        <li>Reversible risk factors</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Outbreak investigation觸發</h4>
+                            <ul>
+                                <li>Culture-negative peritonitis clustering</li>
+                                <li>Unusual organisms</li>
+                                <li>需要：environmental sampling、PD fluid testing、water/air quality評估</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 持續改進</div>
+                            <p>Standardized metrics對benchmarking和monitoring progress至關重要。計算方法：episodes÷patient-years（從PD commencement算起）。Relapsing peritonitis算作original episode的延續。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 21 (原Card 20) -->
+            <div class="card" data-search="結核 TB NTM 分枝桿菌 診斷 tuberculosis mycobacterium">
+                <div class="card-header">
+                    <div class="card-number">21</div>
+                    <h3 class="card-title">結核性腹膜炎診斷陷阱</h3>
+                    <div class="card-summary">
+                        <p>65-78%初期為<span class="highlight">PMN predominance</span>（易誤診）</p>
+                        <p>診斷延遲平均6.7週</p>
+                        <p>TB不一定需catheter removal；NTM需removal</p>
+                        <span class="recommendation-level level-2">2C級推薦</span>
+                        <div class="tag">診斷挑戰</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>Tuberculous peritonitis特徵</h4>
+                            <ul>
+                                <li>症狀：89% abdominal pain，81% fever</li>
+                                <li>誤導性：初期PMN而非lymphocyte predominance</li>
+                                <li>診斷工具：
+                                    <ul>
+                                        <li>Adenosine deaminase（screening，specificity不高）</li>
+                                        <li>PCR（快速但sensitivity不足以排除）</li>
+                                        <li>Culture（gold standard但耗時）</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>TB治療要點</h4>
+                            <ul>
+                                <li>4-drug 2個月，然後INH+RIF至少12個月</li>
+                                <li>多數不需catheter removal（removal rate 52.4%）</li>
+                                <li>Mortality 15%</li>
+                                <li>Treatment delay是唯一mortality predictor</li>
+                                <li>注意drug side effects：optic neuritis、peripheral neuropathy</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>NTM peritonitis差異</h4>
+                            <ul>
+                                <li>主要：M. fortuitum、M. chelonae</li>
+                                <li>診斷延遲：6-30天</li>
+                                <li>易誤認為diphtheroids</li>
+                                <li>Complete cure rate僅14.8%</li>
+                                <li><strong>必須catheter removal</strong>（surgical source control原則）</li>
+                                <li><20%可return to PD</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>診斷要點</h4>
+                            <ul>
+                                <li>持續culture-negative+症狀→考慮acid-fast stain</li>
+                                <li>通知laboratory延長incubation至7天</li>
+                                <li>使用special mycobacterial media</li>
+                                <li>常合併exit-site infection</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 關鍵區別</div>
+                            <p>TB vs NTM的處理完全不同。TB可能保留catheter，NTM必須removal。早期診斷對兩者都很重要，但原因不同：TB為降低mortality，NTM為surgical source control。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 22 -->
+            <div class="card" data-search="全身性 抗生素 劑量 系統性 抗真菌 systemic antibiotic dosing antifungal">
+                <div class="card-header">
+                    <div class="card-number">22</div>
+                    <h3 class="card-title">全身性抗生素劑量建議</h3>
+                    <div class="card-summary">
+                        <p>腹膜炎治療的系統性抗生素用藥指引</p>
+                        <p>包含<span class="highlight">抗細菌</span>和<span class="highlight">抗真菌</span>藥物</p>
+                        <p>適用於無法使用IP給藥或需要全身治療的情況</p>
+                        <span class="recommendation-level level-2">劑量參考表</span>
+                        <div class="tag">Table 6</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>抗細菌藥物 (Antibacterial)</h4>
+                            <ul>
+                                <li><strong>Amoxicillin：</strong>Oral 500 mg TID</li>
+                                <li><strong>Ciprofloxacin：</strong>
+                                    <ul>
+                                        <li>Oral 500-750 mg daily</li>
+                                        <li>Oral 750 mg BID for CCPD</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Clarithromycin：</strong>Oral 250 mg BID</li>
+                                <li><strong>Colistin：</strong>IV 300 mg loading (危重患者)，然後60-200 mg daily</li>
+                                <li><strong>Dalbavancin：</strong>IV 1500 mg over 30 min 單次劑量</li>
+                                <li><strong>Daptomycin：</strong>IV 4-6 mg/kg q48h</li>
+                                <li><strong>Ertapenem：</strong>IV 500 mg daily</li>
+                                <li><strong>Levofloxacin：</strong>
+                                    <ul>
+                                        <li>Oral 250 mg daily 或</li>
+                                        <li>500 mg q48h</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Linezolid：</strong>
+                                    <ul>
+                                        <li>IV or oral 600 mg BID×48h</li>
+                                        <li>然後300 mg BID</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Moxifloxacin：</strong>Oral 400 mg daily</li>
+                                <li><strong>Rifampicin：</strong>
+                                    <ul>
+                                        <li>Oral or IV 450 mg daily (BW <50 kg)</li>
+                                        <li>600 mg daily (BW ≥50 kg)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Ticarcillin/clavulanic acid：</strong>IV 3 gm/0.2 gm q12h</li>
+                                <li><strong>Tigecycline：</strong>IV 100 mg loading，然後50 mg q12h</li>
+                                <li><strong>Trimethoprim/sulfamethoxazole：</strong>Oral 160 mg/800 mg BID</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>抗真菌藥物 (Anti-fungal)</h4>
+                            <ul>
+                                <li><strong>Amphotericin B desoxycholate：</strong>IV 0.75-1.0 mg/kg/day over 4-6h</li>
+                                <li><strong>Amphotericin B (liposomal)：</strong>IV 3-5 mg/kg/day</li>
+                                <li><strong>Anidulafungin：</strong>IV 200 mg loading，然後100 mg daily</li>
+                                <li><strong>Caspofungin：</strong>IV 70 mg loading，然後50 mg daily</li>
+                                <li><strong>Fluconazole：</strong>Oral 200 mg loading，然後100 mg daily</li>
+                                <li><strong>Flucytosine：</strong>Oral 1 gm daily</li>
+                                <li><strong>Isavuconazole：</strong>
+                                    <ul>
+                                        <li>Oral or IV 200 mg q8h×6 doses (48h) loading</li>
+                                        <li>然後200 mg daily</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Micafungin：</strong>IV 100 mg daily</li>
+                                <li><strong>Posaconazole：</strong>
+                                    <ul>
+                                        <li>Oral tablet 300 mg q12h loading×2 doses</li>
+                                        <li>然後300 mg daily</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Voriconazole：</strong>Oral 200 mg q12h</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>使用全身性抗生素的指征</h4>
+                            <ul>
+                                <li>Sepsis或嚴重全身性感染</li>
+                                <li>無法進行IP給藥（如catheter問題）</li>
+                                <li>特定病原體需要（如某些抗真菌藥物）</li>
+                                <li>合併其他部位感染</li>
+                                <li>IP治療失敗需要escalation</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>劑量調整考慮</h4>
+                            <ul>
+                                <li>腹膜透析患者的藥物清除率可能改變</li>
+                                <li>注意residual kidney function的影響</li>
+                                <li>某些藥物（如aminoglycosides）需要監測血中濃度</li>
+                                <li>Echinocandins (anidulafungin, caspofungin, micafungin)在PD中不需劑量調整</li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 臨床要點</div>
+                            <p>雖然IP給藥是腹膜炎治療的首選，但在某些情況下需要全身性治療。記住：(1) 對於septic患者應先給予IV antibiotics；(2) 某些藥物（如echinocandins）只能IV給藥；(3) Voriconazole建議oral而非IV（避免vehicle累積）。本表提供PD患者的調整劑量，多數已考慮腎功能不全。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 23 -->
+            <div class="card" data-search="腸球菌 Enterococcus 治療 ampicillin vancomycin linezolid daptomycin">
+                <div class="card-header">
+                    <div class="card-number">23</div>
+                    <h3 class="card-title">Enterococcus腹膜炎治療</h3>
+                    <div class="card-summary">
+                        <p>單一菌感染：治療<span class="highlight">3週</span></p>
+                        <p>多微生物感染：需額外抗生素+早期拔管考慮</p>
+                        <p>根據藥敏選擇：Amoxicillin、Vancomycin或Linezolid/Daptomycin</p>
+                        <span class="recommendation-level level-2">2C級推薦</span>
+                        <div class="tag">特定病原體</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>Enterococcus腹膜炎分類與處理</h4>
+                            <ul>
+                                <li><strong>單一菌感染（Single-organism）：</strong>
+                                    <ul>
+                                        <li>根據藥敏選擇抗生素</li>
+                                        <li>療程21天</li>
+                                    </ul>
+                                </li>
+                                <li><strong>多微生物感染（Polymicrobial）：</strong>
+                                    <ul>
+                                        <li>需加用針對gram-negative的抗生素</li>
+                                        <li>無臨床改善時及早拔除導管</li>
+                                        <li>提示可能的腸道源感染</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>根據藥敏的治療選擇</h4>
+                            <ol>
+                                <li><strong>Ampicillin敏感：</strong>
+                                    <ul>
+                                        <li>首選：Oral amoxicillin</li>
+                                        <li>療程：21天</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Ampicillin抗藥+Vancomycin敏感：</strong>
+                                    <ul>
+                                        <li>使用：IP vancomycin</li>
+                                        <li>療程：21天</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Vancomycin抗藥（VRE）：</strong>
+                                    <ul>
+                                        <li>選擇1：Oral linezolid</li>
+                                        <li>選擇2：IP daptomycin</li>
+                                        <li>療程：21天</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                        <div class="detail-section">
+                            <h4>治療反應評估</h4>
+                            <ul>
+                                <li><strong>第5天評估：</strong>
+                                    <ul>
+                                        <li>有改善→繼續完成21天療程</li>
+                                        <li>無改善→拔除導管</li>
+                                    </ul>
+                                </li>
+                                <li><strong>拔管後處理：</strong>
+                                    <ul>
+                                        <li>拔管後繼續抗生素14天</li>
+                                        <li>總療程可能短於未拔管者</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Enterococcus的臨床重要性</h4>
+                            <ul>
+                                <li>常見於腸道源感染或醫療相關感染</li>
+                                <li>E. faecalis比E. faecium更常見</li>
+                                <li>E. faecium更可能有vancomycin抗藥性</li>
+                                <li>Polymicrobial感染預後較差</li>
+                                <li>Biofilm形成能力強，可能影響治療反應</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>特殊考慮</h4>
+                            <ul>
+                                <li><strong>Linezolid使用注意：</strong>
+                                    <ul>
+                                        <li>監測血球計數（可能造成血小板減少）</li>
+                                        <li>長期使用需注意周邊神經病變</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Daptomycin使用：</strong>
+                                    <ul>
+                                        <li>需調整劑量（腎功能）</li>
+                                        <li>監測CPK（肌肉毒性）</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 臨床決策要點</div>
+                            <p>Enterococcus腹膜炎需要較長療程（21天）。Polymicrobial感染常提示腸道源，需要積極處理。VRE感染的治療選擇有限，linezolid和daptomycin是主要選項。記住：即使是敏感菌株，治療失敗率仍可能較高，需密切監測。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 24 -->
+                  <div class="card" data-search="環境菌 革蘭氏陰性 Pseudomonas Acinetobacter Stenotrophomonas nonfermenting environmental gram-negative">
+                <div class="card-header">
+                    <div class="card-number">24</div>
+                    <h3 class="card-title">環境性Gram-negative菌治療</h3>
+                    <div class="card-summary">
+                        <p>包括Pseudomonas、Acinetobacter、Stenotrophomonas</p>
+                        <p>需要<span class="highlight">雙重抗生素</span>治療×<span class="highlight">3週</span></p>
+                        <p>無臨床改善需重新培養評估</p>
+                        <span class="recommendation-level level-2">2C級推薦</span>
+                        <div class="tag">特定病原體</div>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-details">
+                    <div class="card-details-content">
+                        <div class="detail-section">
+                            <h4>初始評估原則</h4>
+                            <ul>
+                                <li>無臨床改善時：重新培養並評估</li>
+                                <li>第5天無改善：拔除導管</li>
+                                <li>考慮是否有exit site或tunnel infection</li>
+                                <li>這類菌常有多重抗藥性</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Pseudomonas aeruginosa治療</h4>
+                            <ul>
+                                <li><strong>治療原則：</strong>使用2種不同機制的有效抗生素</li>
+                                <li><strong>建議組合：</strong>
+                                    <ul>
+                                        <li>IP ceftazidime或cefepime +</li>
+                                        <li>IP aminoglycoside（gentamicin/tobramycin/amikacin）或</li>
+                                        <li>Oral ciprofloxacin</li>
+                                    </ul>
+                                </li>
+                                <li><strong>重要提醒：</strong>需評估exit site和tunnel</li>
+                                <li><strong>療程：</strong>21天</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Acinetobacter species治療</h4>
+                            <ul>
+                                <li><strong>一般敏感株選擇：</strong>
+                                    <ul>
+                                        <li>Oral ciprofloxacin 或</li>
+                                        <li>Oral trimethoprim-sulfamethoxazole 或</li>
+                                        <li>IP meropenem 或</li>
+                                        <li>IP aminoglycoside</li>
+                                    </ul>
+                                </li>
+                                <li><strong>CRAB（Carbapenem-resistant）：</strong>
+                                    <ul>
+                                        <li>IP amikacin 或</li>
+                                        <li>IP colistin ± ampicillin/sulbactam</li>
+                                    </ul>
+                                </li>
+                                <li><strong>療程：</strong>21天</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Stenotrophomonas maltophilia治療</h4>
+                            <ul>
+                                <li><strong>治療原則：</strong>使用2種有效抗生素</li>
+                                <li><strong>必須包含：</strong>Oral trimethoprim-sulfamethoxazole</li>
+                                <li><strong>組合選項：</strong>
+                                    <ul>
+                                        <li>TMP-SMX + 另一種有效抗生素</li>
+                                        <li>常見組合：TMP-SMX + ciprofloxacin</li>
+                                        <li>或TMP-SMX + ceftazidime</li>
+                                    </ul>
+                                </li>
+                                <li><strong>療程：</strong>21天</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>治療失敗的處理</h4>
+                            <ul>
+                                <li><strong>5天評估點：</strong>
+                                    <ul>
+                                        <li>有改善→繼續完成21天療程</li>
+                                        <li>無改善→拔除導管，拔管後再治療14天</li>
+                                    </ul>
+                                </li>
+                                <li><strong>持續exit site/tunnel infection：</strong>
+                                    <ul>
+                                        <li>即使腹膜炎緩解</li>
+                                        <li>考慮同步導管移除和重新植入</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="clinical-pearl">
+                            <div class="clinical-pearl-title">💡 關鍵治療原則</div>
+                            <p>非發酵性gram-negative菌需要雙重抗生素覆蓋，且機制應不同。Pseudomonas已有專門指引（見卡片15），但原則相似。Stenotrophomonas必須使用TMP-SMX為基礎的組合。CRAB的治療選擇有限，可能需要使用較老的抗生素如colistin。早期識別治療失敗並及時拔管很重要。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+<!-- Card 25 -->
+<div class="card" data-search="腸道菌 革蘭氏陰性 ESBL AmpC CPE carbapenemase enteric gram-negative">
+    <div class="card-header">
+        <div class="card-number">25</div>
+        <h3 class="card-title">腸道源Gram-negative菌治療</h3>
+        <div class="card-summary">
+            <p>根據抗藥機制分類處理</p>
+            <p>包括一般菌株、ESBL、AmpC、CPE</p>
+            <p>標準療程<span class="highlight">3週</span></p>
+            <span class="recommendation-level level-2">2C級推薦</span>
+            <div class="tag">特定病原體</div>
+        </div>
+        <span class="expand-icon">▼</span>
+    </div>
+    <div class="card-details">
+        <div class="card-details-content">
+            <div class="detail-section">
+                <h4>腸道菌分類與治療選擇</h4>
+                <ol>
+                    <li><strong>一般菌株（Not otherwise specified）：</strong>
+                        <ul>
+                            <li>根據藥敏結果選擇</li>
+                            <li>常用：IP ceftazidime、IP cefepime或oral ciprofloxacin</li>
+                        </ul>
+                    </li>
+                    <li><strong>ESBL-producing菌株：</strong>
+                        <ul>
+                            <li>首選：IP meropenem</li>
+                            <li>若敏感可考慮：oral ciprofloxacin</li>
+                        </ul>
+                    </li>
+                    <li><strong>AmpC β-lactamase producing：</strong>
+                        <ul>
+                            <li>常見菌種：Enterobacter cloacae、Serratia marcescens、Citrobacter、Morganella morganii</li>
+                            <li>首選：IP cefepime</li>
+                            <li>替代：oral ciprofloxacin或IP meropenem</li>
+                        </ul>
+                    </li>
+                    <li><strong>CPE（Carbapenemase-producing Enterobacterales）：</strong>
+                        <ul>
+                            <li>需根據：藥敏結果、carbapenemase類型</li>
+                            <li>建議：諮詢專家意見</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            <div class="detail-section">
+                <h4>ESBL-producing菌株詳細處理</h4>
+                <ul>
+                    <li>Cephalosporins（包括cefepime）不可靠</li>
+                    <li>Carbapenems是最可靠選擇</li>
+                    <li>Ciprofloxacin若敏感可使用，但抗藥性常見</li>
+                    <li>避免使用cephalosporin/β-lactamase inhibitor組合</li>
+                </ul>
+            </div>
+            <div class="detail-section">
+                <h4>AmpC相關考量</h4>
+                <ul>
+                    <li><strong>誘導性抗藥風險：</strong>
+                        <ul>
+                            <li>Third-generation cephalosporins可能誘導AmpC產生</li>
+                            <li>Cefepime較不易誘導（首選）</li>
+                        </ul>
+                    </li>
+                    <li><strong>特定菌種注意：</strong>
+                        <ul>
+                            <li>Enterobacter：高風險產生AmpC</li>
+                            <li>Serratia：常有多重抗藥性</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="detail-section">
+                <h4>CPE處理原則</h4>
+                <ul>
+                    <li><strong>需要了解的資訊：</strong>
+                        <ul>
+                            <li>Carbapenemase類型（KPC、NDM、OXA-48等）</li>
+                            <li>完整藥敏結果</li>
+                            <li>MIC值</li>
+                        </ul>
+                    </li>
+                    <li><strong>可能的治療選項：</strong>
+                        <ul>
+                            <li>新型β-lactam/β-lactamase inhibitor組合</li>
+                            <li>Polymyxins（如colistin）</li>
+                            <li>Tigecycline</li>
+                            <li>組合療法</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="detail-section">
+                <h4>共同治療原則</h4>
+                <ul>
+                    <li><strong>療程：</strong>21天</li>
+                    <li><strong>第5天評估：</strong>
+                        <ul>
+                            <li>有改善→繼續完成療程</li>
+                            <li>無改善→拔除導管，拔管後再治療14天</li>
+                        </ul>
+                    </li>
+                    <li><strong>腸道源提示：</strong>
+                        <ul>
+                            <li>多微生物感染</li>
+                            <li>臨床表現嚴重</li>
+                            <li>可能需要評估是否有腸道病變</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="clinical-pearl">
+                <div class="clinical-pearl-title">💡 臨床重點</div>
+                <p>腸道菌的抗藥機制複雜，正確識別抗藥型態是選擇適當治療的關鍵。ESBL需要carbapenems，AmpC首選cefepime，CPE則需要個別化處理。記住：這些感染常提示腸道源，需評估是否有腸道穿孔、缺血或其他病變。早期識別治療失敗很重要。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Card 26 -->
+<div class="card" data-search="多微生物 腹膜炎 腸道 污染 polymicrobial peritonitis GI contamination">
+    <div class="card-header">
+        <div class="card-number">26</div>
+        <h3 class="card-title">多微生物腹膜炎處理</h3>
+        <div class="card-summary">
+            <p>根據菌種組合判斷可能來源</p>
+            <p>GN為主→考慮<span class="highlight">腸道問題</span>；GP為主→考慮<span class="highlight">污染/導管感染</span></p>
+            <p>最短療程21天，可能需要外科評估</p>
+            <span class="recommendation-level level-2">2C級推薦</span>
+            <div class="tag">特殊情況</div>
+        </div>
+        <span class="expand-icon">▼</span>
+    </div>
+    <div class="card-details">
+        <div class="card-details-content">
+            <div class="detail-section">
+                <h4>多微生物腹膜炎的分類處理</h4>
+                <ol>
+                    <li><strong>多個Gram-negative或混合GN/GP菌：</strong>
+                        <ul>
+                            <li>高度懷疑腸道問題（GI problem）</li>
+                            <li>需要緊急外科評估</li>
+                            <li>可能有腹腔內病變或膿瘍</li>
+                        </ul>
+                    </li>
+                    <li><strong>多個Gram-positive菌：</strong>
+                        <ul>
+                            <li>考慮touch contamination</li>
+                            <li>考慮PD catheter infection</li>
+                            <li>評估是否有exit site或tunnel infection</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            <div class="detail-section">
+                <h4>多個GN菌或混合感染的處理</h4>
+                <ul>
+                    <li><strong>抗生素調整：</strong>
+                        <ul>
+                            <li>Oral metronidazole +</li>
+                            <li>Oral amoxicillin + IP gentamicin 或</li>
+                            <li>IP ceftazidime</li>
+                        </ul>
+                    </li>
+                    <li><strong>緊急外科評估：</strong>
+                        <ul>
+                            <li>排除腸道穿孔</li>
+                            <li>評估是否有腹腔內膿瘍</li>
+                            <li>考慮是否需要開腹探查</li>
+                        </ul>
+                    </li>
+                    <li><strong>若需開腹手術：</strong>
+                        <ul>
+                            <li>發現腹腔內病變/膿瘍→外科移除PD導管</li>
+                            <li>繼續抗生素至少21天</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="detail-section">
+                <h4>多個GP菌感染的處理</h4>
+                <ul>
+                    <li><strong>根據藥敏繼續治療</strong></li>
+                    <li><strong>最短療程21天</strong></li>
+                    <li><strong>根據catheter狀況決定：</strong>
+                        <ul>
+                            <li>無exit site/tunnel infection→繼續抗生素21天</li>
+                            <li>有exit site/tunnel infection→移除PD導管</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="detail-section">
+                <h4>腸道源感染的警示徵象</h4>
+                <ul>
+                    <li>多個腸道菌（E. coli、Klebsiella、Enterococcus等）</li>
+                    <li>厭氧菌存在（Bacteroides等）</li>
+                    <li>臨床表現嚴重（高燒、腹部壓痛、血行動力學不穩）</li>
+                    <li>影像學異常發現</li>
+                    <li>治療反應不佳</li>
+                </ul>
+            </div>
+            <div class="detail-section">
+                <h4>重要治療原則</h4>
+                <ul>
+                    <li><strong>Gentamicin使用注意：</strong>
+                        <ul>
+                            <li>避免prolonged treatment</li>
+                            <li>治療>7天需專科醫師指導</li>
+                            <li>考慮耳毒性和腎毒性風險</li>
+                        </ul>
+                    </li>
+                    <li><strong>療程考量：</strong>
+                        <ul>
+                            <li>最短21天</li>
+                            <li>若有腹腔內病變可能需要更長</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="clinical-pearl">
+                <div class="clinical-pearl-title">💡 臨床決策重點</div>
+                <p>多微生物感染的病原體組合提供重要線索：GN為主強烈提示腸道源，需要緊急外科評估；GP為主考慮技術問題或導管感染。記住：腸道源感染的死亡率高，早期識別和外科介入可能救命。任何懷疑腸道穿孔的情況都應立即會診外科。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Card 27 -->
+<div class="card" data-search="真菌 念珠菌 麴菌 毛黴菌 抗真菌 fungal Candida Aspergillus Mucormycetes antifungal">
+    <div class="card-header">
+        <div class="card-number">27</div>
+        <h3 class="card-title">真菌性腹膜炎治療流程</h3>
+        <div class="card-summary">
+            <p class="important">立即拔除PD導管！</p>
+            <p>根據真菌類型選擇抗真菌藥物</p>
+            <p>Yeast vs Mould的區別處理</p>
+            <span class="recommendation-level level-1">1C級推薦</span>
+            <div class="tag">特定病原體</div>
+        </div>
+        <span class="expand-icon">▼</span>
+    </div>
+    <div class="card-details">
+        <div class="card-details-content">
+            <div class="detail-section">
+                <h4>真菌性腹膜炎的緊急處理</h4>
+                <ul>
+                    <li class="important">培養出真菌→立即安排拔除PD導管</li>
+                    <li>不要等待菌種鑑定或藥敏結果</li>
+                    <li>立即開始經驗性抗真菌治療</li>
+                    <li>拔管是降低死亡率的關鍵</li>
+                </ul>
+            </div>
+            <div class="detail-section">
+                <h4>Yeast（酵母菌）感染 - Candida species</h4>
+                <ol>
+                    <li><strong>Fluconazole敏感菌株：</strong>
+                        <ul>
+                            <li>常見：C. albicans、C. parapsilosis（部分）</li>
+                            <li>治療：Fluconazole</li>
+                            <li>劑量：200mg loading，然後100mg daily</li>
+                        </ul>
+                    </li>
+                    <li><strong>Fluconazole抗藥菌株：</strong>
+                        <ul>
+                            <li>菌種：C. glabrata、C. krusei (Pichia kudriavzevii)、Kodamaea ohmeri</li>
+                            <li>治療選擇：
+                                <ul>
+                                    <li>IV echinocandin（如caspofungin、anidulafungin）或</li>
+                                    <li>Oral voriconazole</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            <div class="detail-section">
+                <h4>Mould（黴菌）感染</h4>
+                <ol>
+                    <li><strong>Aspergillus species：</strong>
+                        <ul>
+                            <li>首選：Oral voriconazole</li>
+                            <li>替代選擇：
+                                <ul>
+                                    <li>Posaconazole</li>
+                                    <li>Isavuconazole</li>
+                                    <li>IV amphotericin B</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Mucormycetes（毛黴菌）：</strong>
+                        <ul>
+                            <li>治療選擇：
+                                <ul>
+                                    <li>IV amphotericin B（首選）或</li>
+                                    <li>Posaconazole</li>
+                                </ul>
+                            </li>
+                            <li>注意：Voriconazole對毛黴菌無效</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            <div class="detail-section">
+                <h4>抗真菌藥物的重要考量</h4>
+                <ul>
+                    <li><strong>Echinocandins：</strong>
+                        <ul>
+                            <li>只能IV給藥</li>
+                            <li>PD fluid中活性受損，不建議IP使用</li>
+                            <li>對Candida有效，對mould無效</li>
+                        </ul>
+                    </li>
+                    <li><strong>Voriconazole：</strong>
+                        <ul>
+                            <li>口服優於IV（避免vehicle累積）</li>
+                            <li>需要監測肝功能</li>
+                            <li>可能的視覺副作用</li>
+                        </ul>
+                    </li>
+                    <li><strong>Amphotericin B：</strong>
+                        <ul>
+                            <li>Liposomal formulation較少腎毒性</li>
+                            <li>對大多數真菌有效</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="detail-section">
+                <h4>治療時程</h4>
+                <ul>
+                    <li>拔管後至少治療2週</li>
+                    <li>嚴重感染或免疫不全者可能需要4週</li>
+                    <li>Return to PD中位時間：15週</li>
+                    <li>只有約1/3患者可成功返回PD</li>
+                </ul>
+            </div>
+            <div class="clinical-pearl">
+                <div class="clinical-pearl-title">💡 關鍵訊息</div>
+                <p>真菌性腹膜炎是medical emergency，死亡率高。立即拔管是最重要的治療步驟，不要因為等待菌種鑑定而延遲。Candida通常先用fluconazole，但要注意C. glabrata和C. krusei天然抗藥。Aspergillus首選voriconazole，Mucormycetes需要amphotericin B。記住：延遲拔管會顯著增加死亡率！</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Card 28 -->
+<div class="card" data-search="培養陰性 腹膜炎 處理 流程 culture negative peritonitis management">
+    <div class="card-header">
+        <div class="card-number">28</div>
+        <h3 class="card-title">培養陰性腹膜炎處理流程</h3>
+        <div class="card-summary">
+            <p>第1-2天培養陰性的系統性處理</p>
+            <p>第3天是關鍵評估點</p>
+            <p>根據臨床反應調整治療策略</p>
+            <span class="recommendation-level level-2">2C級推薦</span>
+            <div class="tag">診斷處理</div>
+        </div>
+        <span class="expand-icon">▼</span>
+    </div>
+    <div class="card-details">
+        <div class="card-details-content">
+            <div class="detail-section">
+                <h4>Day 1-2：初始處理</h4>
+                <ul>
+                    <li>培養陰性→繼續初始經驗性治療</li>
+                    <li>維持gram-positive和gram-negative覆蓋</li>
+                    <li>密切觀察臨床反應</li>
+                    <li>確認培養技術正確（床旁接種、避免冷藏等）</li>
+                </ul>
+            </div>
+            <div class="detail-section">
+                <h4>Day 3：關鍵評估點</h4>
+                <ul>
+                    <li><strong>培養仍陰性時執行：</strong>
+                        <ul>
+                            <li>臨床評估（症狀改善？透析液清澈？）</li>
+                            <li>重複PD fluid白細胞計數和分類</li>
+                            <li>確認WBC趨勢（下降？持平？上升？）</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="detail-section">
+                <h4>臨床改善的處理</h4>
+                <ul>
+                    <li><strong>停止gentamicin</strong>（避免毒性）</li>
+                    <li><strong>繼續cefazolin IP共14天</strong></li>
+                    <li>多數culture-negative peritonitis對此反應良好</li>
+                    <li>可能是：
+                        <ul>
+                            <li>Gram-positive菌（特別是CNS）</li>
+                            <li>先前抗生素使用抑制生長</li>
+                            <li>培養技術問題</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="detail-section">
+                <h4>無臨床改善的處理</h4>
+                <ol>
+                    <li><strong>特殊培養技術：</strong>
+                        <ul>
+                            <li>Mycobacteria（TB、NTM）</li>
+                            <li>Legionella</li>
+                            <li>其他fastidious organisms</li>
+                        </ul>
+                    </li>
+                    <li><strong>考慮真菌：</strong>
+                        <ul>
+                            <li>送fungal culture</li>
+                            <li>考慮經驗性antifungal治療</li>
+                        </ul>
+                    </li>
+                    <li><strong>評估其他原因：</strong>
+                        <ul>
+                            <li>Chemical peritonitis</li>
+                            <li>Eosinophilic peritonitis</li>
+                            <li>Malignancy</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            <div class="detail-section">
+                <h4>後續培養結果的處理</h4>
+                <ol>
+                    <li><strong>培養轉陽性：</strong>
+                        <ul>
+                            <li>根據藥敏調整治療</li>
+                            <li>療程根據鑑定出的菌種決定</li>
+                            <li>臨床改善→繼續抗生素（最短14天，視菌種而定）</li>
+                            <li>無改善→拔除導管，拔管後再治療14天</li>
+                        </ul>
+                    </li>
+                    <li><strong>持續培養陰性：</strong>
+                        <ul>
+                            <li>第5天仍無臨床改善→拔除導管</li>
+                            <li>拔管後繼續抗生素至少14天</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            <div class="detail-section">
+                <h4>Culture-negative peritonitis的常見原因</h4>
+                <ul>
+                    <li>近期抗生素使用</li>
+                    <li>Fastidious organisms（難培養菌）</li>
+                    <li>培養技術問題（如冷藏檢體）</li>
+                    <li>真菌感染（需特殊培養）</li>
+                    <li>Mycobacteria（需延長培養時間）</li>
+                    <li>非感染性原因（chemical、eosinophilic）</li>
+                </ul>
+            </div>
+            <div class="clinical-pearl">
+                <div class="clinical-pearl-title">💡 臨床決策要點</div>
+                <p>Culture-negative peritonitis占10-20%，多數預後良好。第3天的臨床評估很關鍵：有改善者簡化治療避免毒性，無改善者需要擴大診斷範圍。記住：持續culture-negative且第5天無改善是拔管指征。特殊培養（TB、fungi）可能改變處理方向，但不應延遲必要的拔管決定。</p>
+            </div>
+        </div>
+    </div>
+</div>
+    
+
+    </div>
+
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <p>😔 沒有找到相符的內容</p>
+            <p>請嘗試其他關鍵字</p>
+        </div>
+        <footer class="footer">
+            <p>基於 ISPD 2022 腹膜炎指南更新 | 僅供醫療專業人員參考</p>
+            <p>Li PK, et al. Perit Dial Int. 2022;42(2):110-153</p>
+        </footer>
+    <script>
+        // Dose reference toggle
+        document.getElementById('doseToggle').addEventListener('click', function() {
+            const panel = document.getElementById('dosePanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const cards = document.querySelectorAll('.card');
+        const statsElement = document.getElementById('stats');
+        const noResultsElement = document.getElementById('noResults');
+        const cardsContainer = document.getElementById('cardsContainer');
+        // Card expand/collapse functionality
+        cards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Don't toggle if clicking on a link
+                if (e.target.tagName === 'A') return;
+                
+                // Toggle expanded class
+                this.classList.toggle('expanded');
+            });
+        });
+        // Search functionality
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            let visibleCount = 0;
+            cards.forEach(card => {
+                const searchData = card.getAttribute('data-search').toLowerCase();
+                const titleText = card.querySelector('.card-title').textContent.toLowerCase();
+                const contentText = card.textContent.toLowerCase();
+                
+                if (searchTerm === '' || 
+                    searchData.includes(searchTerm) || 
+                    titleText.includes(searchTerm) || 
+                    contentText.includes(searchTerm)) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+            // Update stats
+            if (searchTerm === '') {
+                statsElement.textContent = '顯示 28 個重點卡片';
+            } else {
+                statsElement.textContent = `找到 ${visibleCount} 個相關結果`;
+            }
+            // Show/hide no results message
+            if (visibleCount === 0 && searchTerm !== '') {
+                noResultsElement.style.display = 'block';
+                cardsContainer.style.display = 'none';
+            } else {
+                noResultsElement.style.display = 'none';
+                cardsContainer.style.display = 'grid';
+            }
+        });
+        // Clear search with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+                // Also collapse all expanded cards
+                cards.forEach(card => card.classList.remove('expanded'));
+            }
+        });
+        // Prevent card collapse when selecting text in details
+        document.querySelectorAll('.card-details').forEach(details => {
+            details.addEventListener('mouseup', function(e) {
+                if (window.getSelection().toString()) {
+                    e.stopPropagation();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
